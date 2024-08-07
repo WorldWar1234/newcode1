@@ -1,5 +1,5 @@
 const sharp = require('sharp');
-
+const shouldCompress = require('./shouldCompress');
 const compress = (req, res) => {
   if (!shouldCompress(req)) {
     console.log('Not compressing image, redirecting to original URL');
