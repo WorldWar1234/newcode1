@@ -23,6 +23,8 @@ const compress = (req, res) => {
 
       res.setHeader('content-type', `image/${req.params.webp ? 'webp' : 'jpeg'}`);
       res.setHeader('content-length', info.size);
+      res.setHeader('x-original-size', req.params.originSize);
+      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
       res.status(200).send(output);
     });
 };
