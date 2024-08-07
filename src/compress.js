@@ -1,5 +1,10 @@
 const sharp = require('sharp');
 
+const shouldCompress = (req) => {
+  // Compress images larger than 10KB
+  return req.params.size > 10 * 1024;
+};
+
 const compress = (req, res) => {
   if (!shouldCompress(req)) {
     return res.redirect(req.params.url); // Redirect to original image if no compression needed
