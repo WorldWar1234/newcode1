@@ -1,10 +1,8 @@
 const sharp = require('sharp');
 
 const shouldCompress = (req) => {
-  console.log('Image size:', req.params.size);
-  console.log('Compression threshold:', 10 * 1024);
   // Compress images larger than 10KB
-  return req.params.size > 10 * 1024;
+  return true; // Always compress for now
 };
 
 const compress = (req, res) => {
