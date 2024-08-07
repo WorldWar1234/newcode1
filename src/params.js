@@ -1,4 +1,5 @@
 const DEFAULT_QUALITY = 40;
+const sharp = require('sharp');
 
 function params(req, res, next) {
   const { url, jpeg, bw, l } = req.query;
@@ -10,12 +11,22 @@ function params(req, res, next) {
   const urls = Array.isArray(url) ? url.join('&url=') : url;
   const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
 
-  req.params.url = cleanedUrl;
-  req.params.webp = !jpeg;
-  req.params.grayscale = bw !== '0';
-  req.params.quality = parseInt(l, 10) || DEFAULT_QUALITY;
+  sharp(cleanedUrl)
+    .metadata()
+    .then(metadata => {
+      req.params.url = cleanedUrl;
+      req.params.originType = metadata.format;
+      req.params.originSize = metadata.size;
+      req.params.webp = !jpeg;
+      req.params.grayscale = bw !== '0';
+      req.params.quality = parseInt(l, 10) || DEFAULT_QUALITY;
 
-  next();
+      next();
+    })
+    .catch(error => {
+      console.error('Error fetching image:', error);
+      res.status(500).send('Error fetching image');
+    });
 }
 
 module.exports = params;
