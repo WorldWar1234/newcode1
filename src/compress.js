@@ -15,7 +15,7 @@ const compress = (req, res) => {
     .toBuffer((err, output, info) => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Internal Server Error'); // Send 500 error response
+        return res.redirect(req.params.url); // Redirect to original image if error
       }
 
       res.setHeader('content-type', `image/${req.params.webp ? 'webp' : 'jpeg'}`);
