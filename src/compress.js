@@ -2,7 +2,7 @@ const sharp = require('sharp');
 
 const compress = (req, res) => {
   if (!shouldCompress(req)) {
-    return res.status(200).send('Image does not need compression');
+    return res.redirect(req.params.url); // Redirect to original image if no compression needed
   }
 
   sharp(req.params.url)
@@ -15,7 +15,7 @@ const compress = (req, res) => {
     .toBuffer((err, output, info) => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Error compressing image');
+        return res.status(500).send('Internal Server Error'); // Send 500 error response
       }
 
       res.setHeader('content-type', `image/${req.params.webp ? 'webp' : 'jpeg'}`);
