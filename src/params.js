@@ -11,10 +11,10 @@ function params(req, res, next) {
   const urls = Array.isArray(url) ? url.join('&url=') : url;
   const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
 
-  sharp(cleanedUrl)
+  sharp(req.query.url)
     .metadata()
     .then(metadata => {
-      req.params.url = cleanedUrl;
+      req.params.url = req.query.url;
       req.params.originType = metadata.format;
       req.params.originSize = metadata.size;
       req.params.webp = !jpeg;
