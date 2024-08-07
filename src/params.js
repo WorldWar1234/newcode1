@@ -1,4 +1,5 @@
 const DEFAULT_QUALITY = 40;
+const axios = require('axios');
 const sharp = require('sharp');
 
 function params(req, res, next) {
@@ -8,24 +9,32 @@ function params(req, res, next) {
     return res.end('bandwidth-hero-proxy');
   }
 
-  const urls = Array.isArray(url) ? url.join('&url=') : url;
-  const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
+  axios.head(url)
+    .then(response => {
+      const headers = response.headers;
+      const size = parseInt(headers['content-length'], 10);
+      const type = headers['content-type'];
 
-  sharp(req.query.url)
-    .metadata()
-    .then(metadata => {
-      req.params.url = req.query.url;
-      req.params.originType = metadata.format;
-      req.params.originSize = metadata.size;
-      req.params.webp = !jpeg;
-      req.params.grayscale = bw !== '0';
-      req.params.quality = parseInt(l, 10) || DEFAULT_QUALITY;
+      sharp(url)
+        .metadata()
+        .then(metadata => {
+          req.params.url = url;
+          req.params.originType = type.split('/')[1];
+          req.params.originSize = size;
+          req.params.webp = !jpeg;
+          req.params.grayscale = bw !== '0';
+          req.params.quality = parseInt(l, 10) || DEFAULT_QUALITY;
 
-      next();
+          next();
+        })
+        .catch(error => {
+          console.error('Error fetching image metadata:', error);
+          res.status(500).send('Error fetching image metadata');
+        });
     })
     .catch(error => {
-      console.error('Error fetching image:', error);
-      res.status(500).send('Error fetching image');
+      console.error('Error fetching image headers:', error);
+      res.status(500).send('Error fetching image headers');
     });
 }
 
