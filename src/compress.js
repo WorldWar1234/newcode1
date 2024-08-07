@@ -1,6 +1,6 @@
 const sharp = require('sharp');
 
-function compress(req, res) {
+const compress = (req, res) => {
   if (!shouldCompress(req)) {
     return res.status(200).send('Image does not need compression');
   }
@@ -14,13 +14,14 @@ function compress(req, res) {
     })
     .toBuffer((err, output, info) => {
       if (err) {
-        return res.status(200).send(req.params.url);
+        console.error(err);
+        return res.status(500).send('Error compressing image');
       }
 
       res.setHeader('content-type', `image/${req.params.webp ? 'webp' : 'jpeg'}`);
       res.setHeader('content-length', info.size);
       res.status(200).send(output);
     });
-}
+};
 
 module.exports = compress;
